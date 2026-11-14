@@ -1,7 +1,7 @@
 """모션 픽셀 피치 영상 (메인): 문장마다 그 주장을 증명하는 데이터 애니메이션.
 
 - 내레이션·TTS·게임 보이스는 make_video_retro.py의 SCENES 그대로 (길이 동일)
-- 480x270 픽셀 캔버스, 12fps 계단식 애니메이션 → 1920x1080 nearest 확대
+- 480x270 기준 좌표로 설계하되 1920x1080에 직접 렌더(글자·그래픽 고해상도, 도트 블록·스프라이트는 4px 단위 유지), 12fps 계단식 애니메이션
 - 모든 화면에 출처·기간 태그
 사용: python scripts/make_video_motion.py [--preview]
 출력: docs/video/pitch.mp4, docs/video/script.md, docs/assets/poster.png
@@ -80,11 +80,52 @@ SENS = [(d, PN.run("base", tx_mult=PN.A["tx_mult"]["base"] * (1 + d / 100))["op_
 _fc = {}
 
 
+MIN_FONT = 9  # 기준 좌표 최소 글자 크기(1080p에서 36px)
+
+
 def F(sz, bold=True):
+    sz = max(sz, MIN_FONT) * S
     k = (sz, bold)
     if k not in _fc:
         _fc[k] = ImageFont.truetype(BOLD if bold else REG, sz)
     return _fc[k]
+
+
+class HD:
+    """480x270 좌표로 호출하면 1920x1080에 직접 그린다. 글자·선은 고해상도, 블록은 S픽셀 단위."""
+
+    def __init__(self, draw):
+        self.d = draw
+
+    @staticmethod
+    def _b(xy):
+        x0, y0, x1, y1 = xy
+        x0, x1 = sorted((x0, x1))
+        y0, y1 = sorted((y0, y1))
+        return [round(x0 * S), round(y0 * S), round(x1 * S) + S - 1, round(y1 * S) + S - 1]
+
+    def rectangle(self, xy, fill=None, outline=None, width=1):
+        self.d.rectangle(self._b(xy), fill=fill, outline=outline, width=width * S if outline else 0)
+
+    def ellipse(self, xy, fill=None, outline=None, width=1):
+        self.d.ellipse(self._b(xy), fill=fill, outline=outline, width=max(1, width) * S // 2 + 1)
+
+    def point(self, xy, fill=None):
+        x, y = xy
+        self.d.rectangle([round(x * S), round(y * S), round(x * S) + S - 1, round(y * S) + S - 1], fill=fill)
+
+    def line(self, xy, fill=None, width=1):
+        if xy and isinstance(xy[0], (tuple, list)):
+            pts = [(x * S + S / 2, y * S + S / 2) for x, y in xy]
+        else:
+            pts = [(xy[i] * S + S / 2, xy[i + 1] * S + S / 2) for i in range(0, len(xy), 2)]
+        self.d.line(pts, fill=fill, width=width * S, joint="curve")
+
+    def text(self, xy, s, font=None, fill=None, anchor="la"):
+        self.d.text((xy[0] * S, xy[1] * S), s, font=font, fill=fill, anchor=anchor)
+
+    def textlength(self, s, font=None):
+        return self.d.textlength(s, font=font) / S
 
 
 def T(d, xy, s, sz, fill=TXT, bold=True, anchor="la"):
@@ -183,7 +224,8 @@ def shot_map_pin(d, p, t):
             sprite(d, x0 + 150, 150, CUP, CUP_P, 3)
             if blink(t, 1):
                 d.point((x0 + 160, 146), fill=MUTED)
-    T(d, (20, 214), "점 = 서울 상권 1,650곳 (실제 좌표)", 8, MUTED, bold=False)
+    box(d, 16, 206, 196, 222, fill=DARK, outline=None, n=2)
+    T(d, (22, 208), "점 = 서울 상권 1,650곳 (실제 좌표)", 9, MUTED, bold=False)
 
 
 def shot_kpi(d, p, t):
@@ -601,9 +643,8 @@ SHOTS = [
 
 
 def render(idx, si, title, cap, p, t):
-    im = Image.new("RGB", (W, H), BG)
-    d = ImageDraw.Draw(im)
-    d.fontmode = "1"
+    im = Image.new("RGB", (W * S, H * S), BG)
+    d = HD(ImageDraw.Draw(im))
     fn, src = SHOTS[idx]
     fn(d, p, t)
     chrome(d, si, title, src, cap)
@@ -621,7 +662,7 @@ def main(preview=False):
     for si, (title, sents) in enumerate(R.SCENES):
         for speak, cap in sents:
             if preview:
-                render(idx, si, STAGES[si], cap, 1.0, 0.0).resize((W * 2, H * 2), Image.NEAREST).save(
+                render(idx, si, STAGES[si], cap, 1.0, 0.0).save(
                     os.path.join(TMP, f"pv_{idx:02d}.png"))
                 idx += 1
                 continue
@@ -632,11 +673,11 @@ def main(preview=False):
             dur = wav_dur(wav) + 0.3
             nfr = int(math.ceil(dur * FPS))
             mp4 = os.path.join(TMP, f"s{idx:02d}.mp4")
-            proc = subprocess.Popen([FF, "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}",
+            proc = subprocess.Popen([FF, "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W*S}x{H*S}",
                                      "-r", str(FPS), "-i", "-", "-i", wav, "-af",
                                      "asetrate=22050*1.12,aresample=44100,atempo=0.893,acrusher=bits=8:mode=log:aa=1:mix=0.25,"
                                      "highpass=f=150,lowpass=f=7000,volume=1.6,apad=pad_dur=0.3",
-                                     "-t", f"{dur:.3f}", "-vf", f"scale={W*S}:{H*S}:flags=neighbor", "-c:v", "libx264",
+                                     "-t", f"{dur:.3f}", "-c:v", "libx264", "-crf", "18", "-preset", "medium",
                                      "-pix_fmt", "yuv420p", "-r", "24", "-c:a", "aac", "-ar", "44100", "-ac", "2", mp4],
                                     stdin=subprocess.PIPE)
             anim = max(1.0, dur * 0.8)  # 문장 80% 지점까지 애니메이션 완료
@@ -645,7 +686,7 @@ def main(preview=False):
                 im = render(idx, si, STAGES[si], cap, tt / anim, tt)
                 proc.stdin.write(im.tobytes())
                 if idx == 1 and f == nfr - 1:
-                    im.resize((W * S, H * S), Image.NEAREST).save(os.path.join(ROOT, "docs", "assets", "poster.png"))
+                    im.save(os.path.join(ROOT, "docs", "assets", "poster.png"))
             proc.stdin.close()
             proc.wait()
             md.append(f"| {int(t0 // 60)}:{t0 % 60:05.2f} | {STAGES[si]} | {SHOTS[idx][0].__doc__.strip()} | {speak} |")
