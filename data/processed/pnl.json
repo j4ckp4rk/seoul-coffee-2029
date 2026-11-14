@@ -1,0 +1,198 @@
+{
+ "inputs_from_data": {
+  "area_tx_per_store_day": 145.5,
+  "area_sales_per_store": 632604487,
+  "area_ticket": 11916,
+  "slot_tx_share": {
+   "06_11": 0.18,
+   "11_14": 0.352,
+   "14_17": 0.281,
+   "17_21": 0.179,
+   "21_24": 0.008
+  }
+ },
+ "assumptions": {
+  "tx_mult": {
+   "bear": 0.85,
+   "base": 1.15,
+   "bull": 1.4
+  },
+  "ticket": {
+   "bear": 11000,
+   "base": 12000,
+   "bull": 12600
+  },
+  "days": 360,
+  "cogs_rate": 0.29,
+  "fte": 5.0,
+  "hourly_cost": 15000,
+  "hours_month": 209,
+  "area_m2": 99,
+  "rent_m2": {
+   "bear": 140000,
+   "base": 110000,
+   "bull": 90000
+  },
+  "hq_rate": 0.03,
+  "other_rate": 0.07,
+  "capex": 200000000,
+  "deposit_months": 12,
+  "dep_years": 5
+ },
+ "scenarios": {
+  "bear": {
+   "scenario": "bear",
+   "tx_day": 124,
+   "ticket": 11000,
+   "revenue": 489590592,
+   "cogs": 141981272,
+   "labor": 188100000,
+   "rent": 166320000,
+   "hq": 14687718,
+   "other": 34271341,
+   "dep": 40000000,
+   "op": -95769739,
+   "op_margin": -0.1956,
+   "ebitda": -55769739,
+   "invest": 366320000,
+   "payback_years": null,
+   "breakeven_tx_day": 163
+  },
+  "base": {
+   "scenario": "base",
+   "tx_day": 167,
+   "ticket": 12000,
+   "revenue": 722604296,
+   "cogs": 209555246,
+   "labor": 188100000,
+   "rent": 130680000,
+   "hq": 21678129,
+   "other": 50582301,
+   "dep": 40000000,
+   "op": 82008620,
+   "op_margin": 0.1135,
+   "ebitda": 122008620,
+   "invest": 330680000,
+   "payback_years": 2.71,
+   "breakeven_tx_day": 136
+  },
+  "bull": {
+   "scenario": "bull",
+   "tx_day": 204,
+   "ticket": 12600,
+   "revenue": 923676796,
+   "cogs": 267866271,
+   "labor": 188100000,
+   "rent": 106920000,
+   "hq": 27710304,
+   "other": 64657376,
+   "dep": 40000000,
+   "op": 228422845,
+   "op_margin": 0.2473,
+   "ebitda": 268422845,
+   "invest": 306920000,
+   "payback_years": 1.14,
+   "breakeven_tx_day": 121
+  }
+ },
+ "bottom_up_slots_base": {
+  "06_11": 30,
+  "11_14": 59,
+  "14_17": 47,
+  "17_21": 30,
+  "21_24": 1
+ },
+ "cross_check": {
+  "bottom_up_revenue": 722604296,
+  "top_down_revenue": 732623525,
+  "top_down_raw_area_avg": 632604487,
+  "gap_pct": -0.0137,
+  "note": "Bottom-up=시간대별 일 거래건수×객단가×360일, Top-down=상권 커피점 점포당 연매출×같은 객수배수×(객단가/상권 객단가). 영업일 차이(360 vs 365)만큼 차이"
+ },
+ "sensitivity": [
+  {
+   "var": "tx",
+   "delta": -0.2,
+   "op": -6149104,
+   "op_margin": -0.0106,
+   "payback_years": 9.77
+  },
+  {
+   "var": "tx",
+   "delta": -0.1,
+   "op": 37929758,
+   "op_margin": 0.0583,
+   "payback_years": 4.24
+  },
+  {
+   "var": "tx",
+   "delta": 0.1,
+   "op": 126087483,
+   "op_margin": 0.1586,
+   "payback_years": 1.99
+  },
+  {
+   "var": "tx",
+   "delta": 0.2,
+   "op": 170166345,
+   "op_margin": 0.1962,
+   "payback_years": 1.57
+  },
+  {
+   "var": "ticket",
+   "delta": -0.2,
+   "op": -6149104,
+   "op_margin": -0.0106,
+   "payback_years": 9.77
+  },
+  {
+   "var": "ticket",
+   "delta": -0.1,
+   "op": 37929758,
+   "op_margin": 0.0583,
+   "payback_years": 4.24
+  },
+  {
+   "var": "ticket",
+   "delta": 0.1,
+   "op": 126087483,
+   "op_margin": 0.1586,
+   "payback_years": 1.99
+  },
+  {
+   "var": "ticket",
+   "delta": 0.2,
+   "op": 170166345,
+   "op_margin": 0.1962,
+   "payback_years": 1.57
+  },
+  {
+   "var": "rent",
+   "delta": -0.2,
+   "op": 108144620,
+   "op_margin": 0.1497,
+   "payback_years": 2.06
+  },
+  {
+   "var": "rent",
+   "delta": -0.1,
+   "op": 95076620,
+   "op_margin": 0.1316,
+   "payback_years": 2.35
+  },
+  {
+   "var": "rent",
+   "delta": 0.1,
+   "op": 68940620,
+   "op_margin": 0.0954,
+   "payback_years": 3.16
+  },
+  {
+   "var": "rent",
+   "delta": 0.2,
+   "op": 55872620,
+   "op_margin": 0.0773,
+   "payback_years": 3.72
+  }
+ ]
+}
