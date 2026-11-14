@@ -90,10 +90,18 @@ for e in ev:
     src_rows += (f"<tr id='{e['id']}'><td>{e['id']}</td><td class='l'>{html.escape(e['claim'])}</td><td>{html.escape(str(e['value']))}</td>"
                  f"<td>{html.escape(e['unit'])}</td><td>{html.escape(e['period'])}</td><td class='l'>{link}</td><td>{e['verified']}</td></tr>")
 
+
+# ---- 히어로: 2022 매출 상위 66곳 역성장 격자 ----
+_bt = sorted(csv.DictReader(open(os.path.join(P, "backtest_2022_2025.csv"), encoding="utf-8-sig")), key=lambda r: -float(r["sales_2022"]))[:66]
+gsvg = '<svg viewBox="0 0 242 134" role="img" aria-label="2022 매출 상위 66곳 중 3년 뒤 역성장 상권">'
+for i, rr in enumerate(_bt):
+    neg = float(rr["actual_cagr_22_25"]) < 0
+    gsvg += f'<rect x="{(i%11)*22}" y="{(i//11)*22}" width="18" height="18" class="{"neg" if neg else "pos"}"><title>{html.escape(rr["상권명"])} {float(rr["actual_cagr_22_25"])*100:+.1f}%/년</title></rect>'
+gsvg += "</svg>"
 page = open(os.path.join(ROOT, "scripts", "page_template.html"), encoding="utf-8").read()
 page = (page.replace("{{FEAT_ROWS}}", feat_rows).replace("{{BT_ROWS}}", bt_rows).replace("{{QSVG}}", qsvg)
         .replace("{{CMP_ROWS}}", cmp_rows).replace("{{PL_ROWS}}", pl_rows).replace("{{SENS_ROWS}}", sens_rows)
-        .replace("{{SRC_ROWS}}", src_rows).replace("{{SRC_OA}}", SRC_OA).replace("{{N_EV}}", str(len(ev)))
+        .replace("{{SRC_ROWS}}", src_rows).replace("{{SRC_OA}}", SRC_OA).replace("{{GRID}}", gsvg).replace("{{N_EV}}", str(len(ev)))
         .replace("{{N_Y}}", str(sum(1 for e in ev if e["verified"] == "Y"))))
 page = re.sub(r"\[\[(E\d\d(?:,E\d\d)*)\]\]", lambda m: r(*m.group(1).split(",")), page)
 missing = sorted(set(re.findall(r'href="#(E\d\d)"', page)) - {e["id"] for e in ev})

@@ -49,6 +49,7 @@ svg .lbl{font-size:12px;fill:var(--ink);font-weight:700}svg .tk{font-size:11px;f
 .tree div{background:var(--card);border:2px solid var(--px);padding:10px;font-size:14px}
 .tree b{display:block;color:var(--accent)}
 .faq dt{font-weight:800;margin-top:12px}.faq dd{margin:4px 0 0 0;color:var(--ink)}
+.toc{position:sticky;top:0;z-index:5;background:var(--px);overflow-x:auto;white-space:nowrap}.toc a{display:inline-block;color:var(--bg);padding:8px 10px;font-size:13px;font-weight:700;text-decoration:none}.toc a:hover{text-decoration:underline}section{scroll-margin-top:44px}
 footer{padding:30px 0 60px;color:var(--muted);font-size:13px}
 @media (max-width:860px){.hero-grid,.grid2{grid-template-columns:1fr}.tree{grid-template-columns:1fr 1fr}header.hero{min-height:auto}.kpi .v{font-size:22px}}
 </style>
@@ -72,6 +73,7 @@ footer{padding:30px 0 60px;color:var(--muted);font-size:13px}
  </div>
 </div></header>
 
+<nav class="toc"><div class="wrap"><a href="#insight">인사이트</a><a href="#metrics">지표</a><a href="#compare">상권 선정</a><a href="#target">타깃</a><a href="#space">공간</a><a href="#menu">메뉴</a><a href="#pnl">손익</a><a href="#risk">리스크</a><a href="#sources">출처</a></div></nav>
 <main class="wrap">
 
 <section id="insight">
@@ -84,6 +86,8 @@ footer{padding:30px 0 60px;color:var(--muted);font-size:13px}
   </div>
   <div class="card" style="text-align:center">
    <div class="big">41%</div>
+   {{GRID}}
+   <p class="note">칸 = 2022년 매출 순위 1~66위 상권, <span style="color:var(--bad)">■</span> 역성장 · <span style="color:var(--good)">■</span> 성장 (마우스를 올리면 상권명)</p>
    <p>2022년 매출 상위 10% 상권 중<br>3년 뒤 역성장한 비율[[E08]]</p>
    <p class="note">표본: 2022년 커피 매출 3억 원 이상 서울 상권 661곳[[E02]] · 2022→2025 추정매출 연평균 성장률 · 출처 {{SRC_OA}}</p>
   </div>
