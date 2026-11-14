@@ -40,16 +40,21 @@ for k, v in bt["backtest"].items():
                 f"<td>{v['top10pct_mean_cagr']*100:+.2f}%</td></tr>")
 
 # ---- 5분위 SVG ----
+# 층 분리: 값 라벨(막대 끝) / 축 라벨 Q1~Q5 (y=188) / 점수 낮음·높음 (y=206)
 q = [x["mean_cagr"] * 100 for x in bt["backtest_quintiles"]]
-qsvg = '<svg viewBox="0 0 360 170" role="img" aria-label="점수 5분위별 실제 3년 CAGR"><line x1="30" y1="90" x2="350" y2="90" class="ax"/>'
+ZERO, K = 84, 11  # 기준선 y, 1%p당 px
+qsvg = '<svg viewBox="0 0 360 214" role="img" aria-label="점수 5분위별 실제 3년 CAGR">'
+qsvg += f'<line x1="20" y1="{ZERO}" x2="350" y2="{ZERO}" class="ax"/><text x="16" y="{ZERO+4}" text-anchor="end" class="tk">0</text>'
 for i, v in enumerate(q):
-    x = 45 + i * 62
-    h = v * 9
-    y = 90 - h if h > 0 else 90
-    qsvg += f'<rect x="{x}" y="{y:.1f}" width="40" height="{abs(h):.1f}" class="{"pos" if v > 0 else "neg"}"/>'
-    qsvg += f'<text x="{x+20}" y="{(y-5) if v>0 else (90+abs(h)+13):.1f}" text-anchor="middle" class="lbl">{v:+.1f}%</text>'
-    qsvg += f'<text x="{x+20}" y="165" text-anchor="middle" class="tk">Q{i+1}</text>'
-qsvg += '<text x="30" y="160" class="tk">점수 낮음</text><text x="350" y="160" text-anchor="end" class="tk">점수 높음</text></svg>'
+    x = 40 + i * 62
+    h = abs(v) * K
+    y = ZERO - h if v > 0 else ZERO
+    qsvg += f'<rect x="{x}" y="{y:.1f}" width="40" height="{h:.1f}" class="{"pos" if v > 0 else "neg"}"/>'
+    ly = (y - 6) if v > 0 else (ZERO + h + 14)
+    qsvg += f'<text x="{x+20}" y="{ly:.1f}" text-anchor="middle" class="lbl">{v:+.1f}%</text>'
+    qsvg += f'<text x="{x+20}" y="188" text-anchor="middle" class="tk">Q{i+1}</text>'
+qsvg += '<line x1="40" y1="198" x2="328" y2="198" class="ax" stroke-dasharray="2 3"/>'
+qsvg += '<text x="40" y="210" class="tk">← 점수 낮음</text><text x="328" y="210" text-anchor="end" class="tk">점수 높음 →</text></svg>'
 
 # ---- 상권 비교(Top 3 + 참고) ----
 prof = json.load(open(os.path.join(P, "profile.json"), encoding="utf-8"))["areas"]
