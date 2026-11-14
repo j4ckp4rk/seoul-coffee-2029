@@ -4,7 +4,7 @@
 기본 시나리오 기준 연매출 7.2억 원, 영업이익률 11.4%, 투자회수 2.7년.
 
 - 웹 보고서: `docs/index.html` (GitHub Pages)
-- 피치 영상: `docs/video/pitch.mp4` (119초, 레트로 픽셀아트)
+- 피치 영상: `docs/video/pitch.mp4` (119초, 세련된 픽셀아트) · 보관용 레트로 버전 `docs/video/pitch_retro.mp4`
 
 ## 데이터 출처
 
@@ -26,7 +26,8 @@ python scripts/profile_area.py  # 추천 상권 고객 프로필
 python scripts/pnl.py           # 손익 3시나리오·민감도
 python scripts/evidence.py      # 근거 원장 생성·재조회 검증
 python scripts/build_page.py    # docs/index.html
-python scripts/make_video.py    # docs/video/pitch.mp4 (Windows SAPI 한국어 음성 + ffmpeg)
+python scripts/make_video_refined.py  # docs/video/pitch.mp4 (Windows SAPI 한국어 음성 + ffmpeg)
+python scripts/make_video_retro.py    # docs/video/pitch_retro.mp4 (보관용 레트로 버전)
 ```
 
 ## 폴더

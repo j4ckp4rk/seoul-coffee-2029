@@ -1,7 +1,7 @@
 """레트로 픽셀아트 피치 영상: 문장별 TTS(Windows SAPI 한국어) + 320x180 도트 화면 x4 확대 + ffmpeg 합성.
 
 사용: python scripts/make_video.py
-출력: docs/video/pitch.mp4, docs/video/script.md, docs/assets/poster.png
+출력: docs/video/pitch_retro.mp4, docs/video/script_retro.md, docs/assets/poster_retro.png (보관용 레트로 버전)
 """
 import glob
 import json
@@ -227,7 +227,7 @@ def main():
             png = os.path.join(TMP, f"s{n:02d}.png")
             frame(si, title, cap, 0).save(png)
             if n == 0:
-                frame(si, title, cap, 0).save(os.path.join(ROOT, "docs", "assets", "poster.png"))
+                frame(si, title, cap, 0).save(os.path.join(ROOT, "docs", "assets", "poster_retro.png"))
             pad = 0.3
             mp4 = os.path.join(TMP, f"s{n:02d}.mp4")
             subprocess.run([FF, "-y", "-loglevel", "error", "-loop", "1", "-i", png, "-i", wav, "-af", f"asetrate=22050*1.12,aresample=44100,atempo=0.893,acrusher=bits=8:mode=log:aa=1:mix=0.35,highpass=f=180,lowpass=f=6000,volume=1.6,apad=pad_dur={pad}",
@@ -239,12 +239,12 @@ def main():
             n += 1
     lst = os.path.join(TMP, "list.txt")
     open(lst, "w", encoding="utf-8").write("".join(f"file '{c}'\n" for c in clips))
-    out = os.path.join(VID, "pitch.mp4")
+    out = os.path.join(VID, "pitch_retro.mp4")
     subprocess.run([FF, "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", lst, "-c", "copy", out], check=True)
     script_md += ["", f"총 길이: {t:.1f}초"]
-    open(os.path.join(VID, "script.md"), "w", encoding="utf-8").write("\n".join(script_md))
+    open(os.path.join(VID, "script_retro.md"), "w", encoding="utf-8").write("\n".join(script_md))
     print(json.dumps({"total_sec": round(t, 1), "first_scene_end": None}))
 
 
 if __name__ == "__main__":
-    main()
+    main()  # 레트로 버전. 메인 영상은 scripts/make_video_refined.py
