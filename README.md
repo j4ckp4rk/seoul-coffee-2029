@@ -4,7 +4,7 @@
 기본 시나리오 기준 연매출 7.2억 원, 영업이익률 11.4%, 투자회수 2.7년.
 
 - 웹 보고서: `docs/index.html` (GitHub Pages)
-- 피치 영상: `docs/video/pitch.mp4` (약 2분, 문장별 데이터 애니메이션 픽셀 모션) · 보관: `pitch_retro.mp4`(레트로 원본), `pitch_static.mp4`(정지화면판)
+- 피치 영상: `docs/video/pitch.mp4` (약 2분, 라인드로잉 데이터 애니메이션) · 보관: `pitch_pixel.mp4`(픽셀 모션), `pitch_static.mp4`(픽셀 정지화면), `pitch_retro.mp4`(레트로 원본)
 
 ## 데이터 출처
 
@@ -26,7 +26,8 @@ python scripts/profile_area.py  # 추천 상권 고객 프로필
 python scripts/pnl.py           # 손익 3시나리오·민감도
 python scripts/evidence.py      # 근거 원장 생성·재조회 검증
 python scripts/build_page.py    # docs/index.html
-python scripts/make_video_motion.py   # docs/video/pitch.mp4 (메인: 데이터 모션, Windows SAPI 한국어 음성 + ffmpeg)
+python scripts/make_video_line.py     # docs/video/pitch.mp4 (메인: 라인드로잉, Windows SAPI 한국어 음성 + ffmpeg)
+python scripts/make_video_motion.py   # docs/video/pitch_pixel.mp4 (보관용 픽셀 모션판)
 python scripts/make_video_refined.py  # 정지화면판 (출력 경로를 pitch_static.mp4로 바꿔 사용)
 python scripts/make_video_retro.py    # docs/video/pitch_retro.mp4 (보관용 레트로 버전)
 ```

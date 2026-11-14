@@ -686,7 +686,7 @@ def main(preview=False):
                 im = render(idx, si, STAGES[si], cap, tt / anim, tt)
                 proc.stdin.write(im.tobytes())
                 if idx == 1 and f == nfr - 1:
-                    im.save(os.path.join(ROOT, "docs", "assets", "poster.png"))
+                    im.save(os.path.join(TMP, "poster_pixel.png"))
             proc.stdin.close()
             proc.wait()
             md.append(f"| {int(t0 // 60)}:{t0 % 60:05.2f} | {STAGES[si]} | {SHOTS[idx][0].__doc__.strip()} | {speak} |")
@@ -699,10 +699,10 @@ def main(preview=False):
     lst = os.path.join(TMP, "list.txt")
     open(lst, "w", encoding="utf-8").write("".join(f"file '{c}'\n" for c in clips))
     subprocess.run([FF, "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", lst, "-c", "copy",
-                    os.path.join(VID, "pitch.mp4")], check=True)
+                    os.path.join(VID, "pitch_pixel.mp4")], check=True)
     md += ["", f"총 길이: {t0:.1f}초", "",
            "보관 버전: `pitch_retro.mp4`(레트로 원본), `pitch_static.mp4`(정지화면 픽셀)"]
-    open(os.path.join(VID, "script.md"), "w", encoding="utf-8").write("\n".join(md))
+    open(os.path.join(VID, "script_pixel.md"), "w", encoding="utf-8").write("\n".join(md))
     print(f"total {t0:.1f}s")
 
 
