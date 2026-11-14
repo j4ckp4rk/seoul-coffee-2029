@@ -18,7 +18,7 @@
 
 ```bash
 echo SEOUL_API_KEY=<서울 열린데이터광장 인증키> > .env
-pip install numpy pillow
+pip install numpy pillow edge-tts
 python scripts/collect.py       # 원본 수집 → data/raw
 python scripts/analyze.py       # 지표·상관·백테스트·점수 → data/processed
 python scripts/select_area.py   # 선별 깔때기·인사이트
@@ -26,7 +26,7 @@ python scripts/profile_area.py  # 추천 상권 고객 프로필
 python scripts/pnl.py           # 손익 3시나리오·민감도
 python scripts/evidence.py      # 근거 원장 생성·재조회 검증
 python scripts/build_page.py    # docs/index.html
-python scripts/make_video_line.py     # docs/video/pitch.mp4 (메인: 라인드로잉, Windows SAPI 한국어 음성 + ffmpeg)
+python scripts/make_video_line.py     # docs/video/pitch.mp4 (메인: 라인드로잉, Edge 뉴럴 음성 SunHi + ffmpeg, 인터넷 필요)
 python scripts/make_video_motion.py   # docs/video/pitch_pixel.mp4 (보관용 픽셀 모션판)
 python scripts/make_video_refined.py  # 정지화면판 (출력 경로를 pitch_static.mp4로 바꿔 사용)
 python scripts/make_video_retro.py    # docs/video/pitch_retro.mp4 (보관용 레트로 버전)

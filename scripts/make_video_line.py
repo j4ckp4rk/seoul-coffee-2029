@@ -3,10 +3,11 @@
 - 크림색 종이 + 잉크 선, 강조색은 주황(핵심) · 초록(성장) 두 가지
 - 모든 선은 '그려지는' 애니메이션(경로 길이 비율), 살짝 흔들리는 손그림 선, 빗금 채움
 - 데이터는 make_video_motion.py와 동일(상권 1,650곳 좌표, 분기 매출, 백테스트, 손익)
-- 내레이션: 차분한 프레젠테이션 톤, 문장 간격을 자동 조정해 총 약 120초
+- 내레이션: Edge 뉴럴 음성 ko-KR-SunHiNeural(+10%), 차분한 프레젠테이션 톤, 문장 간격 자동 조정해 총 약 119초
 사용: python scripts/make_video_line.py [--preview]
 출력: docs/video/pitch.mp4, docs/video/script.md, docs/assets/poster.png
 """
+import asyncio
 import math
 import os
 import random
@@ -34,7 +35,7 @@ seg, blink = M.seg, M.blink
 # ---------------- 내레이션 (차분한 톤) ----------------
 SCENES = [
     ("결론", [
-        ("결론부터 말씀드리겠습니다. 다음 매장은 삼성동 코엑스, 봉은사역 7번 출구입니다.", "다음 매장: 삼성동 코엑스, 봉은사역 7번 출구"),
+        ("결론부터 말씀드립니다. 다음 매장은 삼성동 코엑스, 봉은사역 7번 출구입니다.", "다음 매장: 삼성동 코엑스, 봉은사역 7번 출구"),
         ("예상 연매출 칠억 이천만 원, 영업이익률 십일 점 사 퍼센트, 투자회수 이 점 칠 년입니다.", "연매출 7.2억 · 영업이익률 11.4% · 투자회수 2.7년"),
     ]),
     ("왜 여기인가", [
@@ -681,6 +682,17 @@ def render(idx, si, cap, p, t):
     return im
 
 
+VOICE, VOICE_RATE = "ko-KR-SunHiNeural", "+10%"   # Edge 뉴럴 음성 (pip install edge-tts)
+
+
+def tts_neural(text, wav):
+    """Edge 뉴럴 TTS → mp3 → 44.1kHz wav. 캐시 키 = 음성|속도|문장."""
+    import edge_tts
+    mp3 = wav[:-4] + ".mp3"
+    asyncio.run(edge_tts.Communicate(text, VOICE, rate=VOICE_RATE).save(mp3))
+    subprocess.run([FF, "-y", "-loglevel", "error", "-i", mp3, "-ar", "44100", "-ac", "1", wav], check=True)
+
+
 def wav_dur(path):
     with wave.open(path) as w:
         return w.getnframes() / w.getframerate()
@@ -694,13 +706,20 @@ def main(preview=False):
         print("preview done")
         return
     durs = []
+    tts_only = "--tts-only" in sys.argv
     for i, (si, sp, cap) in enumerate(flat):
         wav = os.path.join(TMP, f"s{i:02d}.wav")
         txt = wav + ".txt"
-        if not (os.path.exists(wav) and os.path.exists(txt) and open(txt, encoding="utf-8").read() == sp):
-            R.tts(sp, wav, rate=2)
+        key = f"{VOICE}|{VOICE_RATE}|{sp}"
+        if not (os.path.exists(wav) and os.path.exists(txt) and open(txt, encoding="utf-8").read() == key):
+            tts_neural(sp, wav)
+            open(txt, "w", encoding="utf-8").write(key)
         durs.append(wav_dur(wav))
     pad = max(0.2, min(0.65, (TARGET_SEC - sum(durs)) / len(durs)))
+    if tts_only:
+        print(f"speech {sum(durs):.1f}s, pad {pad:.2f}, total {sum(durs)+pad*len(durs):.1f}s, "
+              f"KPI ends {durs[0]+pad+durs[1]:.2f}s")
+        return
     md = ["# 피치 영상 스크립트 (라인드로잉 버전)", "", "| 시작 | 장면 | 화면(근거) | 내레이션 |", "|---|---|---|---|"]
     clips, t0 = [], 0.0
     for i, (si, sp, cap) in enumerate(flat):
@@ -709,7 +728,7 @@ def main(preview=False):
         nfr = int(math.ceil(dur * FPS))
         mp4 = os.path.join(TMP, f"s{i:02d}.mp4")
         proc = subprocess.Popen([FF, "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W*S}x{H*S}",
-                                 "-r", str(FPS), "-i", "-", "-i", wav, "-af", f"highpass=f=70,volume=1.5,apad=pad_dur={pad:.3f}",
+                                 "-r", str(FPS), "-i", "-", "-i", wav, "-af", f"highpass=f=70,volume=1.2,apad=pad_dur={pad:.3f}",
                                  "-t", f"{dur:.3f}", "-c:v", "libx264", "-crf", "18", "-preset", "medium", "-pix_fmt", "yuv420p",
                                  "-r", "24", "-c:a", "aac", "-ar", "44100", "-ac", "2", mp4], stdin=subprocess.PIPE)
         anim = max(1.0, dur * 0.8)
